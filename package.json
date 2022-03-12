@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "commander": "^9.0.0",
+    "prettier": "^2.5.1"
+  },
+  "name": "v12-to-v13",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": "./bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
