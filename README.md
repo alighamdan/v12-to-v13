@@ -40,7 +40,7 @@ converter(v12_Code, with_Pretty, prettier_Options);
 // key2: code: string
 // key3: convertTime: number (time in ms)
 
-//NOTE: prettied key can be false in some times if the result code have an error
+// NOTE: prettied key can be false in some times if the result code have an error
 ```
 
 ## Author

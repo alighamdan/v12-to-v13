@@ -1,17 +1,27 @@
 {
-  "dependencies": {
-    "commander": "^9.0.0",
-    "prettier": "^2.5.1"
-  },
   "name": "v12-to-v13",
   "version": "1.0.0",
   "main": "index.js",
-  "bin": "./bin/index.js",
+  "bin": {
+    "v12-to-v13": "bin/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "ali dev",
   "license": "ISC",
-  "description": ""
+  "description": "<h1 align=\"center\">Welcome to v12-to-v13 👋</h1> <p>   <img alt=\"Version\" src=\"https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000\" />   <a href=\"https://github.com/alighamdan/v12-to-v13\" target=\"_blank\">     <img alt=\"Documentation\" src=\"https://img.shields.io/badge/documentation-yes-brightgreen.svg\" />   </a>   <a href=\"#\" target=\"_blank\">     <img alt=\"License: ISC\" src=\"https://img.shields.io/badge/License-ISC-yellow.svg\" />   </a> </p>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alighamdan/v12-to-v13.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alighamdan/v12-to-v13/issues"
+  },
+  "homepage": "https://github.com/alighamdan/v12-to-v13#readme",
+  "dependencies": {
+    "commander": "^9.0.0",
+    "prettier": "^2.5.1"
+  }
 }
