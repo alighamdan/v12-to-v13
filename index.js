@@ -3,6 +3,13 @@ const prettier = require("prettier");
 
 
 module.exports['default'] = {
+    /**
+     * 
+     * @param {string} code 
+     * @param {boolean} pretty 
+     * @param {import("prettier").Options} options 
+     * @returns { { prettied: boolean, code: string, convertTime:number } }
+     */
     converter: function (code, pretty = false, options = { parser: "babel" }) {
         if(!code) {
             return {
@@ -16,20 +23,16 @@ module.exports['default'] = {
         let prettied = false;
         
         if(pretty) {
-            try {
-                var c = prettier.format(code, options);
-            } catch (error) {};
-        
-            if(c) {
+            try{
+                converted = prettier.format(converted, options);
                 prettied = true;
-                converted = c;
-            }
+            }catch(e){}
         }
         
         return {
             prettied,
             code: converted,
-            convertTime: Date.now() - startTime
+            convertTime: Date.now() - startTime,
         }
     }
 }

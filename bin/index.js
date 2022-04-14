@@ -1,39 +1,50 @@
-const { program } = require("commander");
-const fs = require("fs");
-const chalk = require("chalk");
-const path = require("path");
-const { files, converter, convertTime } = require("../functions");
-const { format } = require("prettier");
+const yargs = require('yargs');
+const fs = require('fs');
+const path = require('path');
+const chalk = require('chalk');
+const { converter, files, convertTime } = require('../functions');
+const prettier = require('prettier');
 
-program.version("1.0.0").description("discord.js v12 to v13 code converter");
+let input = yargs.argv.input;
+let output = yargs.argv.output;
+let pretty = isYes(yargs.argv.pretty);
+let log = isYes(yargs.argv.log);
 
-program
-  .option("-i, --input <dir>", "input for discord.js v12 project folder")
-  .option(
-    "-o, --output [dir]",
-    "output path for discord.js v13 project folder",
-    null
-  )
-  .option(
-    "-p, --pretty",
-    "pretty your project codes using prettier, optional.",
-    null
-  )
-  .option("-l, --log", "enable|disable send logs to the console", null);
+if (yargs.argv.h || !input) {
+  console.log(`
+  discord.js v12 to v13 code converter
+  ----------------------------------
+  --input <dir>  input for discord.js v12 project folder
+  --output [dir] output path for discord.js v13 project folder
+  --pretty       pretty your project codes using prettier, optional.
+  --log          enable|disable send logs to the console (default: enabled)
+  ${
+    chalk.bold.green(`----------------codded by----------------`)
+  }\n${
+    chalk.bold.yellow(`@ali ghamdan=> https://github.com/alighamdan`)
+  }
+  \n${
+    chalk.bold.green(
+      `@Pudochu => https://github.com/pudochu | https://discord.gg/cortex`
+    )
+    }
+  `);
+  process.exit(0);
+}
 
-program.parse(process.argv);
+if (yargs.argv.version) {
+  console.log(require('../package.json').version);
+  process.exit(0);
+}
 
-let input = program.getOptionValue("input");
-let output = program.getOptionValue("output");
-let pretty = !!program.getOptionValue("pretty");
-let log = !!program.getOptionValue("log");
 
-if (!fs.existsSync(input)) {
+if(!fs.existsSync(input)) {
   console.error(
     `🔍 ${chalk.bold.red("No such File or Directory With This directory!")}`
   );
   process.exit(1);
 }
+
 
 let inputPath = path.resolve(input);
 let outputPath =
@@ -43,7 +54,7 @@ let outputPath =
     "extracted-v13"
   )}`;
 
-if (!fs.existsSync(outputPath)) {
+if(!fs.existsSync(outputPath)) {
   fs.mkdirSync(outputPath);
 }
 outputPath = path.resolve(outputPath);
@@ -55,7 +66,7 @@ let outputFiles = FF.map((f) => {
   return path.resolve(outputPath, f);
 });
 
-if (log) {
+if(log) {
   console.info(chalk.bold.grey(`ℹ converting ...`));
 }
 
@@ -63,10 +74,10 @@ let startTime = Date.now();
 
 let r = inputFiles.reduce((u, file, i) => {
   let outputFile = outputFiles[i];
-  if (!outputFile) return;
+  if(!outputFile) return;
   let code = fs.readFileSync(file, "utf-8");
 
-  if (log) {
+  if(log) {
     console.info(
       chalk.bold.grey(`ℹ converting "${file.replace(inputPath, "")}"`)
     );
@@ -74,44 +85,49 @@ let r = inputFiles.reduce((u, file, i) => {
 
   let converted = converter(code);
 
-  if (pretty) {
+  if(pretty) {
     try {
-      converted = format(converted, {
+      converted = prettier.format(converted, {
         parser: path.extname(file) === "ts" ? "babel-ts" : "babel",
       });
     } catch (e) {}
   }
-  if (log) {
+  if(log) {
     console.info(
       chalk.bold.grey(
-        `ℹ converted "${outputFile.replace(outputPath, "")}", writing`
+        `ℹ converted "${file.replace(inputPath, "")}" in ${Date.now() -
+          startTime}ms`
       )
     );
   }
   fs.writeFileSync(outputFile, converted);
-  if (log) {
-    console.info(
-      chalk.bold.grey(
-        `ℹ done from write "${outputFile.replace(outputPath, "")}" code`
-      )
-    );
-  }
   u.push({
     input: file,
     output: outputFile,
     code,
-    convertedAt: Date.now(),
-  });
+    converted,
+  })
   return u;
-}, []);
+}, [])
 
 if (log) {
-  console.info(chalk.bold.grey(`ℹ done from converting`));
   console.info(
-    chalk.bold.green(
-      `ℹ ${r.length}/${
-        inputFiles.length
-      } file has been converted in: ${convertTime(Date.now() - startTime)}`
+    chalk.bold.grey(
+      `ℹ converted ${r.length} files in ${convertTime(Date.now() - startTime)}ms`
     )
   );
+}
+
+function isYes(str) {
+  return [
+    "yes",
+    "on",
+    "true",
+    "enable",
+    "run",
+    "1",
+    "start",
+    "y",
+    "ye"
+  ].includes(String(str).toLowerCase())
 }

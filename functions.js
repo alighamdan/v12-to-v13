@@ -8,6 +8,7 @@ const { resolve } = require("path");
 function converter(code) {
   return code
     .replace(/(?<=(.+))\.channelID/g, ".channelId")
+    .replace(/(?<=(.+))\.parentID/g, ".parentId")
     .replace(/(?<=\.(on|once)\()('|"|`)(message)('|"|`)/g, '"messageCreate"')
     .replace(
       /(?<=\.(on|once)\()('|"|`)(interaction)('|"|`)/g,
@@ -25,7 +26,7 @@ function converter(code) {
     )
     .replace(/(?<=(\w+))(\.guild\.owner((\.)?(\w+)?)?)/g, ".guild.ownerId")
     .replace(/(?<=\.(send|reply|edit)\()('|"|`)?(.+)('|"|`)?(?=\))/g, (sub) => {
-      if (sub.match(/('|"|`)(.+)('|"|`)/)) {
+      if (sub.match(/('|"|`)(.+)('|"|`)/) && !sub.includes("MessageEmbed")) {
         return `{ content: ${sub} }`;
       } else {
         return `{ embeds: [${sub}] }`;
@@ -54,6 +55,7 @@ function converter(code) {
       /(?<=((\w+)\.)?type(\s+|\n+)?((\=\=(\=)?)|:)?(\s+|\n+)?)('|"|`)(dm|text|voice|category|news|store|unknown)('|"|`)/g,
       (sub) => {
         var type;
+        sub = sub.toLowerCase();
         if (sub === '"dm"') type = "DM";
         else if (sub === '"text"') type = "GUILD_TEXT";
         else if (sub === '"voice"') type = "GUILD_VOICE";
@@ -108,18 +110,72 @@ function converter(code) {
         return `{ reason: ${sub} }`;
       }
     )
-    .replace(/(\w+\.+)?delete.+\)/g, (sub) => {
-      let timeout = sub.match(/(?<=timeout(\s+|\n+)?:).+}/);
-      if (!timeout) return sub;
+    .replace(
+      /(\w+|_+)(\s+|\n+)?\.(\s+|\n+)?delete(\s+|\n+)?\((\s+|\n+)?\{(\s+|\n+)?delete(\s+|\n+)?:(\s+|\n+)?\d+(\s+|\n+)?}(\s+|\n+)?\)/g,
+      (sub) => {
+        let timeout = sub.match(/(?<=timeout(\s+|\n+)?:).+}/);
+        if (!timeout) return sub;
 
-      timeout = timeout[0]
-        ?.split("")
-        ?.filter((e) => {
-          return !isNaN(parseInt(e));
-        })
-        ?.join("");
+        timeout = timeout[0]
+          ?.split("")
+          ?.filter((e) => {
+            return !isNaN(parseInt(e));
+          })
+          ?.join("");
 
-      return `setTimeout(() => { ${sub.split(".")[0]}.delete() },${timeout})`;
+        return `setTimeout(() => { ${
+          sub.split(".")[0]
+        }.delete() },${timeout}))`;
+      }
+    )
+    .replace(/(?<=\.(setFooter)\()('|"|`)?(.+)('|"|`)?(?=\))/g, (sub) => {
+      let x = false;
+      if (sub.includes("',")) x = "',";
+      if (sub.includes('",')) x = '",';
+      if (sub.includes("`,")) x = "`,";
+      if (!x) {
+        return `{text:${sub}}`;
+      }
+      let f = sub.split(x);
+      f[0] = f[0] + x.slice(0, 1);
+      if (f.length > 2)
+        console.log("[Footer-Info] Maybe this is Error: " + sub);
+      if (f.length == 1) {
+        return `{text:${f[0]}}`;
+      } else {
+        return `{text:${f[0]}, iconURL:${f[1]} }`;
+      }
+    })
+
+    .replace(/(?<=\.(setAuthor)\()('|"|`)?(.+)('|"|`)?(?=\))/g, (sub) => {
+      let x = false;
+      if (sub.includes("',")) x = "',";
+      if (sub.includes('",')) x = '",';
+      if (sub.includes("`,")) x = "`,";
+      if (!x) return;
+      let z = x.replace(",", "");
+      let f = sub.split(x);
+      if (f.length > 3) console.log("Maybe this is Error: " + sub);
+      let avatar_ve_url = f[1].trim().split(z);
+
+      if (avatar_ve_url[1] && avatar_ve_url[1].includes("http")) {
+        avatar_ve_url =
+          "iconURL: " +
+          avatar_ve_url[0] +
+          "url: " +
+          "'" +
+          avatar_ve_url[1] +
+          "'";
+      } else {
+        avatar_ve_url = "iconURL: " + avatar_ve_url[0].replace(",", "");
+      }
+      if (f.length == 1) {
+        return `{name:${f[0]}${z}}`;
+      } else if (f.length == 2) {
+        return `{name:${f[0]}${z}, ${avatar_ve_url} }`;
+      } else {
+        return `{name:${f[0]}${z}, ${avatar_ve_url} }`;
+      }
     });
 }
 

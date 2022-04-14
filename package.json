@@ -1,6 +1,6 @@
 {
   "name": "v12-to-v13",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "bin": {
     "v12-to-v13": "bin/index.js"
@@ -21,7 +21,9 @@
   },
   "homepage": "https://github.com/alighamdan/v12-to-v13#readme",
   "dependencies": {
+    "chalk": "^4.1.0",
     "commander": "^9.0.0",
-    "prettier": "^2.5.1"
+    "prettier": "^2.5.1",
+    "yargs": "^17.4.1"
   }
 }

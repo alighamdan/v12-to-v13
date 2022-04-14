@@ -43,11 +43,15 @@ converter(v12_Code, with_Pretty, prettier_Options);
 // NOTE: prettied key can be false in some times if the result code have an error
 ```
 
-## Author
+## Authors
 
 👤 **ali dev**
 
 * Github: [@alighamdan](https://github.com/alighamdan)
+
+👤 **Pudochu**
+* Github: **[@pudochu](https://github.com/pudochu)**
+* Discord: **[Cortex](https://discord.gg/cortex)**
 
 ## 🤝 Contributing
 
